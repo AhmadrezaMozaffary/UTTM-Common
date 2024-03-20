@@ -18,7 +18,7 @@ jobs:
              exit 1
              
       - name: Check Branch Names - release/rls#.#
-        if: ${{ github.base_ref.match('^release/rls\\d+\\.d+$') && !github.head_ref.match('^rls\\d+\\.\\d+\\/(?:feat|fix)') }}
+        if: ${{ startsWith(github.base_ref, 'release/rls') && !startsWith(github.head_ref,'rls') || !startsWith(github.head_ref,'rls') && !(contains(github.head_ref, '/feat') || contains(github.head_ref, '/fix'))  }}
         run: |
              then echo "ERROR⛔: Branch name must start with 'rls#.#/feat/' or 'rls#.#/fix/' --> Exiting..."
              exit 1
