@@ -16,18 +16,11 @@ jobs:
         uses: actions/checkout@v2
       - name: Check Branch Names
         run: |
-          echo "${{github.ref}} Its a test for this step"
-   #       BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD) if [[ "$BRANCH_NAME" == "dvp" ]];  
-    #      then if [[ ! "$BRANCH_NAME" =~ ^(feat/|fix/) ]]; 
-     #     then echo "Error: Branch name for 'dvp' must start with 'feat/' or 'fix/'. Exiting..." exit 1 fi 
-     #     elif [[ "$BRANCH_NAME" == "rls1.0" ]]; 
-     #     then if [[ ! "$BRANCH_NAME" =~ ^(rls1.0/feat|rls1.0/fix) ]]; 
-     #     then echo "Error: Branch name for 'rls1.0' must start with 'rls1.0/feat' or 'rls1.0/fix'. Exiting..." exit 1 fi 
-
-        # fi # Check if push is directly to the branches 
-        # if [[ "$GITHUB_REF" =~ ^refs/heads/(dvp|rls1.0)$ ]]; 
-        # then echo "Error: Direct push to '$BRANCH_NAME' is not allowed. Exiting..." 
-        # exit 1 fi
+          BRANCH_NAME=$(echo "${{github.ref}}" | cut -d '/' 2)
+          if [[ ! "$BRANCH_NAME" =~ ^(feat|fix|rls[0-9]+\.[0-9]+)\/]];
+          then echo "ERROR: Branch name must start with 'feat/', 'fix/', rls#.#/feat or rls#.#/fix" --> Exiting..."
+            exit 1
+          fi
 
   super-linter:
     runs-on: ubuntu-latest
