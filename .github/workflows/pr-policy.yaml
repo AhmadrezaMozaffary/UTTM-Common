@@ -12,13 +12,10 @@ jobs:
         uses: actions/checkout@v2
         
       - name: Check Branch Names
-        run: >
-          echo "Your target branch is "${{github.base_ref}}", applying rules for
-          branch ${{github.head_ref}}, Wait...";
-
+        run: |
           if [[ "${{github.base_ref}}" =~ "dvp" && "${{github.head_ref}}" =~ ^(feat|fix)\/]];
              then echo " Branching rules applied and the result is 'OK ✅' "
-          else
-             then echo "ERROR⛔: Branch name must start with 'feat/' or 'fix/'" --> Exiting..."
-          exit 1
+          else 
+             then echo "ERROR⛔: Branch name must start with 'feat/' or 'fix/' --> Exiting..."
+             exit 1
           fi
