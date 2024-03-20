@@ -1,10 +1,10 @@
 name: Check Branches
 on:
   push:
-    branches: 
-        - "*"
-        - "*/*"
-        - "**"
+    branches:
+      - "*"
+      - "*/*"
+      - "**"
 
 jobs:
   check_branches:
@@ -14,7 +14,7 @@ jobs:
         uses: actions/checkout@v2
       - name: Check Branch Names
         run: |
-          BRANCH_NAME=$(echo "${{github.ref}}")
+          BRANCH_NAME=$(echo "Your current branch is ${{github.event.pull_request.head.ref}}, applying rules...")
           if [[ ! "$BRANCH_NAME" =~ ^(feat|fix|rls[0-9]+\.[0-9]+)\/]];
           then echo "ERROR: Branch name must start with 'feat/', 'fix/', rls#.#/feat or rls#.#/fix" --> Exiting..."
             exit 1
@@ -37,7 +37,7 @@ jobs:
           fetch-depth: 0
 
       - name: Super-linter
-        uses: super-linter/super-linter@v6.3.0  # x-release-please-version
+        uses: super-linter/super-linter@v6.3.0 # x-release-please-version
         env:
           # To report GitHub Actions status checks
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
@@ -46,16 +46,14 @@ jobs:
     runs-on: ubuntu-latest
     needs: [super-linter]
     steps:
-      - name: Check Branch Prefix 
+      - name: Check Branch Prefix
         run: |
           echo 'hi'
-#   DEST_BRANCH=$(echo "${{ github.ref }}" | cut -d '/' -f 2) if [[ "$DEST_BRANCH" =~ ^rls[0-9]+\.0$ ]]; then echo "Branch starts with 'rls' followed by an integer. Proceeding to deploy." else echo "Branch does not meet deploy criteria. Skipping deployment." exit 0 fi
-    
-      - name: Upload to npm registry 
+      #   DEST_BRANCH=$(echo "${{ github.ref }}" | cut -d '/' -f 2) if [[ "$DEST_BRANCH" =~ ^rls[0-9]+\.0$ ]]; then echo "Branch starts with 'rls' followed by an integer. Proceeding to deploy." else echo "Branch does not meet deploy criteria. Skipping deployment." exit 0 fi
+      - name: Upload to npm registry
         run: |
           # Your deployment script or commands here
-   
-  
+
   success-build-email:
     runs-on: ubuntu-latest
     needs: [super-linter]
@@ -71,7 +69,7 @@ jobs:
           body: "A push has been made to branch ${{ github.ref }} by ${{ github.actor }}."
           to: ${{ github.actor }}
           from: "your-email@gmail.com"
-  
+
   success-release-email:
     runs-on: ubuntu-latest
     needs: [release]
