@@ -11,11 +11,14 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v2
         
-      - name: Check Branch Names
+      - name: Check Branch Names - DVP
+        if: ${{github.base_ref == 'dvp' && !startWith(github.head_ref, 'fix/') ||  github.base_ref == 'dvp' && !startWith(github.head_ref, 'feat/') }}
         run: |
-          if [[ "${{github.base_ref}}" =~ "dvp" && "${{github.head_ref}}" =~ ^(feat|fix)\/]];
-             then echo " Branching rules applied and the result is 'OK ✅' "
-          else 
              then echo "ERROR⛔: Branch name must start with 'feat/' or 'fix/' --> Exiting..."
              exit 1
-          fi
+             
+      - name: Check Branch Names - release/rls#.#
+        if: ${{ github.base_ref =~ '^release/rls\\d+\\.d+$' && !(github.head_ref =~ '^rls\\d+\\.\\d+\\/(?:feat|fix)') }}
+        run: |
+             then echo "ERROR⛔: Branch name must start with 'rls#.#/feat/' or 'rls#.#/fix/' --> Exiting..."
+             exit 1
