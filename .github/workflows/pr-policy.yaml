@@ -1,28 +1,28 @@
 name: Check Branches
 on:
-  push:
+  pull_request:
     branches:
-      - "*"
-      - "*/*"
-      - "**"
+      - "dvp"
+      - "release/rls*"
 
 jobs:
-  check_branches:
+  Checking-Branch-Rules:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
+
       - name: Check Branch Names
         run: |
-          BRANCH_NAME=$(echo "Your current branch is ${{github.head_ref}}, applying rules...")
+          BRANCH_NAME=$(echo "Your current branch is ${{github.event.pull_request.head.ref}}, applying rules...")
           if [[ ! "$BRANCH_NAME" =~ ^(feat|fix|rls[0-9]+\.[0-9]+)\/]];
           then echo "ERROR: Branch name must start with 'feat/', 'fix/', rls#.#/feat or rls#.#/fix" --> Exiting..."
             exit 1
           fi
 
-  super-linter:
+  Linting-Codes:
     runs-on: ubuntu-latest
-    needs: [check_branches]
+    needs: [Checking-Branch-Rules]
     permissions:
       contents: read
       packages: read
@@ -42,9 +42,10 @@ jobs:
           # To report GitHub Actions status checks
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-  release:
+  Release-Package:
+    if: ${{github.event.pull_request.base.ref == 'release/rls*'}}
     runs-on: ubuntu-latest
-    needs: [super-linter]
+    needs: [Linting-Codes]
     steps:
       - name: Check Branch Prefix
         run: |
@@ -54,9 +55,9 @@ jobs:
         run: |
           # Your deployment script or commands here
 
-  success-build-email:
+  Sending-Mail-After-Succeeded:
     runs-on: ubuntu-latest
-    needs: [super-linter]
+    needs: [Linting-Codes]
     steps:
       - name: Send Email Notification
         uses: dawidd6/action-send-mail@v3
@@ -70,9 +71,9 @@ jobs:
           to: ${{ github.actor }}
           from: "your-email@gmail.com"
 
-  success-release-email:
+  Sending-Mail-After-Released:
     runs-on: ubuntu-latest
-    needs: [release]
+    needs: [Release-Package]
     steps:
       - name: Send Email Notification For release
         uses: dawidd6/action-send-mail@v3
