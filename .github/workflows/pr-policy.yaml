@@ -15,10 +15,17 @@ jobs:
       - name: Check Branch Names
         run: |
           BRANCH_NAME=$(echo "Your current branch is ${{github.base_ref}} compare with ${{github.head_ref}}, applying rules...")
-          if [[ ! "$BRANCH_NAME" =~ ^(feat|fix|rls[0-9]+\.[0-9]+)\/]];
+          if [[ "${{github.base_ref}}" =~ dvp ]]
+          if [[ ! "${{github.head_ref}}" =~ ^(feat|fix)\/]];
           then echo "ERROR: Branch name must start with 'feat/', 'fix/', rls#.#/feat or rls#.#/fix" --> Exiting..."
-            exit 1
+          exit 1
+          
+          if [[ "${{github.base_ref}}" =~ release/rls* ]]
+          if [[ ! "${{github.head_ref}}" =~ ^(rls[0-9]+\.[0-9]+)\/]];
+          then echo "ERROR: Branch name must start with 'feat/', 'fix/', rls#.#/feat or rls#.#/fix" --> Exiting..."
+          exit 1
           fi
+        #(rls[0-9]+\.[0-9]+)\/
 
   Linting-Codes:
     runs-on: ubuntu-latest
