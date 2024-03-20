@@ -1,0 +1,86 @@
+name: Check Branches
+on:
+  push:
+    branches: 
+        - "*"
+        - "*/*"
+        - "**"
+      # - "dvp"
+      # - "rls1.0"
+
+jobs:
+  check_branches:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v2
+      - name: Check Branch Names
+        run: |
+          BRANCH_NAME=$(git rev-parse --abbrev-ref HEAD) if [[ "$BRANCH_NAME" == "dvp" ]];  then if [[ ! "$BRANCH_NAME" =~ ^(feat/|fix/) ]]; then echo "Error: Branch name for 'dvp' must start with 'feat/' or 'fix/'. Exiting..." exit 1 fi elif [[ "$BRANCH_NAME" == "rls1.0" ]]; then if [[ ! "$BRANCH_NAME" =~ ^(rls1.0/feat|rls1.0/fix) ]]; then echo "Error: Branch name for 'rls1.0' must start with 'rls1.0/feat' or 'rls1.0/fix'. Exiting..." exit 1 fi fi # Check if push is directly to the branches if [[ "$GITHUB_REF" =~ ^refs/heads/(dvp|rls1.0)$ ]]; then echo "Error: Direct push to '$BRANCH_NAME' is not allowed. Exiting..." exit 1 fi
+
+  super-linter:
+    runs-on: ubuntu-latest
+    needs: [check_branches]
+    permissions:
+      contents: read
+      packages: read
+      # To report GitHub Actions status checks
+      statuses: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          # super-linter needs the full git history to get the
+          # list of files that changed across commits
+          fetch-depth: 0
+
+      - name: Super-linter
+        uses: super-linter/super-linter@v6.3.0  # x-release-please-version
+        env:
+          # To report GitHub Actions status checks
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [super-linter]
+    steps:
+      - name: Check Branch Prefix 
+        run: |
+          DEST_BRANCH=$(echo "${{ github.ref }}" | cut -d '/' -f 2) if [[ "$DEST_BRANCH" =~ ^rls[0-9]+\.0$ ]]; then echo "Branch starts with 'rls' followed by an integer. Proceeding to deploy." else echo "Branch does not meet deploy criteria. Skipping deployment." exit 0 fi
+    
+      - name: Upload to npm registry 
+        run: |
+          # Your deployment script or commands here
+   
+  
+  success-build-email:
+    runs-on: ubuntu-latest
+    needs: [super-linter]
+    steps:
+      - name: Send Email Notification
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "Branch Push Notification"
+          body: "A push has been made to branch ${{ github.ref }} by ${{ github.actor }}."
+          to: ${{ github.actor }}
+          from: "your-email@gmail.com"
+  
+  success-release-email:
+    runs-on: ubuntu-latest
+    needs: [release]
+    steps:
+      - name: Send Email Notification For release
+        uses: dawidd6/action-send-mail@v3
+        with:
+          server_address: smtp.gmail.com
+          server_port: 587
+          username: ${{ secrets.EMAIL_USERNAME }}
+          password: ${{ secrets.EMAIL_PASSWORD }}
+          subject: "New version is released - Branch Push Notification"
+          body: "A push has been made to branch ${{ github.ref }} by ${{ github.actor }}."
+          to: ${{ github.actor }}
+          from: "your-email@gmail.com"
