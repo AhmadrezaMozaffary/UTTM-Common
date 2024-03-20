@@ -21,3 +21,4 @@ jobs:
           else
              then echo "ERROR⛔: Branch name must start with 'feat/' or 'fix/'" --> Exiting..."
           exit 1
+          fi
