@@ -56,7 +56,8 @@ jobs:
     steps:
       - name: Check Branch Prefix 
         run: |
-          DEST_BRANCH=$(echo "${{ github.ref }}" | cut -d '/' -f 2) if [[ "$DEST_BRANCH" =~ ^rls[0-9]+\.0$ ]]; then echo "Branch starts with 'rls' followed by an integer. Proceeding to deploy." else echo "Branch does not meet deploy criteria. Skipping deployment." exit 0 fi
+          echo 'hi'
+#   DEST_BRANCH=$(echo "${{ github.ref }}" | cut -d '/' -f 2) if [[ "$DEST_BRANCH" =~ ^rls[0-9]+\.0$ ]]; then echo "Branch starts with 'rls' followed by an integer. Proceeding to deploy." else echo "Branch does not meet deploy criteria. Skipping deployment." exit 0 fi
     
       - name: Upload to npm registry 
         run: |
