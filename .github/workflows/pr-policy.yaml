@@ -1,13 +1,14 @@
-
-name: Build and Deploy
+name: Check Branches
 "on":
   pull_request:
     branches:
       - dvp
       - release/rls**
 jobs:
-  Checking-Branch-Rules:
+  Checking_Branch_Rules:
     runs-on: ubuntu-latest
+    outputs:
+      rls_check_result: ${{steps.test_rls.outputs.result}}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
@@ -21,17 +22,20 @@ jobs:
           exit 1
 
       - name: Check Branch Names - release/rls#.#
+        id: "test_rls"
         env:
           FULL_BRANCH_NAME_RLS: ${{ format('{0}/{1}', github.base_ref, github.head_ref) }}
         if: ${{ (github.base_ref != 'dvp') && !contains(env.FULL_BRANCH_NAME_RLS,'rls\d+\.\d+\/feat\/') && !contains(env.FULL_BRANCH_NAME_RLS,'rls\\d+\\.\\d+\\/fix\/')  }}
         run: |
+          echo "result=false" >> "$GITHUB_OUTPUT"
           echo "ERROR⛔: Branch name  ( ${{github.head_ref}} ) must start with 'rls#.#/feat/' or 'rls#.#/fix/' --> Exiting..."
           exit 1
 
-  Release-Package:
+  Release_Package:
     runs-on: ubuntu-latest
-    if: ${{ startsWith(github.base_ref, 'release/rls') }}
+    if: ${{ needs.Checking_Branch_Rules.outputs.rls_check_result }}
+    needs: [Checking_Branch_Rules]
     steps:
       - name: Upload to npm registry
         run: |
-          echo "DEPLOYING... 🚀"
+          echo " DEPLOYING... 🚀"
