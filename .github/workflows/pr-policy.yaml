@@ -23,7 +23,7 @@ jobs:
 
       - name: Check Branch Names - release/rls#.#
         id: "test_rls"
-        if: ${{ contains(github.base_ref, 'release/rls') && !contains(github.head_ref,'rls/fix/') && !contains(github_head_ref,'rls/feat/') }}
+        if: ${{ contains(github.base_ref, 'release/rls') && !contains(github.head_ref,'rls/fix/') && !contains(github.head_ref,'rls/feat/') }}
         run: |
           echo "result=false" >> "$GITHUB_OUTPUT"
           echo "ERROR⛔: Branch name  ( ${{github.head_ref}} ) must start with 'rls#.#/feat/' or 'rls#.#/fix/' --> Exiting..."
