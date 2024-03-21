@@ -14,7 +14,7 @@ jobs:
       - name: Check Branch Names  - dvp
         env: 
             FULL_BRANCH_NAME_DVP: ${{ format('{0}/{1}', github.base_ref, github.head_ref) }}
-        if: ${{ (github.base_ref == 'dvp) && !contains(env.FULL_BRANCH_NAME_DVP,'dvp/feat/') && !contains(env.FULL_BRANCH_NAME_DVP,'dvp/fix/')  }}
+        if: ${{ (github.base_ref == 'dvp') && !contains(env.FULL_BRANCH_NAME_DVP,'dvp/feat/') && !contains(env.FULL_BRANCH_NAME_DVP,'dvp/fix/')  }}
         run: |
              echo "ERROR⛔: Branch name ( ${{github.head_ref}} ) must start with 'feat/' or 'fix/' --> Exiting..."
              exit 1
@@ -22,7 +22,7 @@ jobs:
       - name: Check Branch Names - release/rls#.#
         env: 
           FULL_BRANCH_NAME_RLS: ${{ format('{0}/{1}', github.base_ref, github.head_ref) }}
-        if: ${{ (github.base_ref != 'dvp) && !contains(env.FULL_BRANCH_NAME_RLS,'rls\d+\.\d+\/feat\/') && !contains(env.FULL_BRANCH_NAME_RLS,'rls\\d+\\.\\d+\\/fix\/')  }}
+        if: ${{ (github.base_ref != 'dvp') && !contains(env.FULL_BRANCH_NAME_RLS,'rls\d+\.\d+\/feat\/') && !contains(env.FULL_BRANCH_NAME_RLS,'rls\\d+\\.\\d+\\/fix\/')  }}
         run: |
-             echo "ERROR⛔: ${{ env.FULL_BRANCH_NAME_RLS }} Branch name  ( ${{github.head_ref}} ) must start with 'rls#.#/feat/' or 'rls#.#/fix/' --> Exiting..."
+             echo "ERROR⛔: Branch name  ( ${{github.head_ref}} ) must start with 'rls#.#/feat/' or 'rls#.#/fix/' --> Exiting..."
              exit 1
