@@ -1,4 +1,4 @@
-function HelloUTTMCommon(input = "HI dear users") {
+function HelloUTTMCommon(input = "HI dejar users") {
   console.log(input);
 }
 
