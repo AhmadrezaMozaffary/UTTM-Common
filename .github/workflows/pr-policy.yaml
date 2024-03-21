@@ -5,24 +5,35 @@ name: Check Branches
       - dvp
       - release/rls**
 jobs:
-  Checking-Branch-Rules:
+  Checking_Branch_Rules:
     runs-on: ubuntu-latest
+    outputs:
+      rls_check_result: ${{steps.test_rls.outputs.result}}
     steps:
       - name: Checkout Repository
         uses: actions/checkout@v2
-        
+
       - name: Check Branch Names  - dvp
-        env: 
-            FULL_BRANCH_NAME_DVP: ${{ format('{0}/{1}', github.base_ref, github.head_ref) }}
+        env:
+          FULL_BRANCH_NAME_DVP: ${{ format('{0}/{1}', github.base_ref, github.head_ref) }}
         if: ${{ (github.base_ref == 'dvp') && !contains(env.FULL_BRANCH_NAME_DVP,'dvp/feat/') && !contains(env.FULL_BRANCH_NAME_DVP,'dvp/fix/')  }}
         run: |
-             echo "ERROR⛔: Branch name ( ${{github.head_ref}} ) must start with 'feat/' or 'fix/' --> Exiting..."
-             exit 1
-             
+          echo "ERROR⛔: Branch name ( ${{github.head_ref}} ) must start with 'feat/' or 'fix/' --> Exiting..."
+          exit 1
+
       - name: Check Branch Names - release/rls#.#
-        env: 
-          FULL_BRANCH_NAME_RLS: ${{ format('{0}/{1}', github.base_ref, github.head_ref) }}
-        if: ${{ (github.base_ref != 'dvp') && !contains(env.FULL_BRANCH_NAME_RLS,'rls\d+\.\d+\/feat\/') && !contains(env.FULL_BRANCH_NAME_RLS,'rls\\d+\\.\\d+\\/fix\/')  }}
+        id: "test_rls"
+        if: ${{ contains(github.base_ref, 'release/rls') && !contains(github.head_ref,'rls/fix/') && !contains(github_head_ref,'rls/feat/') }}
         run: |
-             echo "ERROR⛔: Branch name  ( ${{github.head_ref}} ) must start with 'rls#.#/feat/' or 'rls#.#/fix/' --> Exiting..."
-             exit 1
+          echo "result=false" >> "$GITHUB_OUTPUT"
+          echo "ERROR⛔: Branch name  ( ${{github.head_ref}} ) must start with 'rls#.#/feat/' or 'rls#.#/fix/' --> Exiting..."
+          exit 1
+
+  Release_Package:
+    runs-on: ubuntu-latest
+    needs: [Checking_Branch_Rules]
+    if: ${{ needs.Checking_Branch_Rules.outputs.rls_check_result }}
+    steps:
+      - name: Upload to npm registry
+        run: |
+          echo " DEPLOYING... 🚀"
