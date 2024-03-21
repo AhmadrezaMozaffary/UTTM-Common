@@ -26,13 +26,13 @@ jobs:
         if: ${{ contains(github.base_ref, 'release/rls') && !contains(github.head_ref,'rls/fix/') && !contains(github.head_ref,'rls/feat/') }}
         run: |
           echo "result=false" >> "$GITHUB_OUTPUT"
-          echo "ERROR⛔: Branch name  ( ${{github.head_ref}} ) must start with 'rls#.#/feat/' or 'rls#.#/fix/' --> Exiting..."
+          echo "ERROR⛔: Branch name  ( ${{github.head_ref}} ) must start with 'rls/feat/' or 'rls/fix/' --> Exiting..."
           exit 1
 
   Release_Package:
     runs-on: ubuntu-latest
     needs: [Checking_Branch_Rules]
-    if: ${{ needs.Checking_Branch_Rules.outputs.rls_check_result }}
+    if: ${{ contains(github.base_ref, 'release/rls') }}
     steps:
       - name: Upload to npm registry
         run: |
