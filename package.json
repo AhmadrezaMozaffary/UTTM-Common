@@ -1,0 +1,25 @@
+{
+  "name": "uttm-common",
+  "version": "1.0.0",
+  "description": "Web components and angular components that will use in UTTM-Frontend angular application",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AhmadrezaMozaffary/UTTM-Common.git"
+  },
+  "keywords": [
+    "UTTM",
+    "Angular",
+    "Stencil",
+    "WebComponents"
+  ],
+  "author": "Ahmadreza Mozaffary",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AhmadrezaMozaffary/UTTM-Common/issues"
+  },
+  "homepage": "https://github.com/AhmadrezaMozaffary/UTTM-Common#readme"
+}
