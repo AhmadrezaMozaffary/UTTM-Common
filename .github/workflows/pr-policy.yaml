@@ -13,7 +13,7 @@ jobs:
         
       - name: Check Branch Names  - dvp
         env: 
-            FULL_BRANCH_NAME: ${{github.base_ref + '/' + github.head_ref}}
+            FULL_BRANCH_NAME: ${{ format('{0}/{1}', github.base_ref, github.head_ref) }}
         if: ${{ !startsWith($FULL_BRANCH_NAME, 'dvp/fix/') || !startsWith($FULL_BRANCH_NAME, 'dvp/feat/') }}
         run: |
              echo "ERROR⛔: Branch name ( ${{github.head_ref}} ) must start with 'feat/' or 'fix/' --> Exiting..."
